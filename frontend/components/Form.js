@@ -36,6 +36,7 @@ export default function Form() {
     toppings: [],
   });
   const [errors, setErrors] = useState({});
+  const [successMessage, setSuccessMessage] = useState(''); // Added successMessage state
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // 👇 Function to validate the form
@@ -61,16 +62,24 @@ export default function Form() {
     if (isValid) {
       setIsSubmitting(true);
       setTimeout(() => {
-        console.log('Form Submitted:', formValues);
+        setSuccessMessage(
+          `Order placed successfully! Full Name: ${formValues.fullName}, Size: ${formValues.size}, Toppings: ${
+            formValues.toppings.length > 0
+              ? formValues.toppings.join(', ')
+              : 'None'
+          }`
+        );
         setIsSubmitting(false);
-      }, 2000);
+        setFormValues({ fullName: '', size: '', toppings: [] }); // Reset form values
+      }, 1000);
     }
   };
 
   return (
     <form onSubmit={handleSubmit}>
       <h2>Order Your Pizza</h2>
-      {isSubmitting && <div className="success">Thank you for your order!</div>}
+      {/* Success Message */}
+      {successMessage && <div className="success">{successMessage}</div>}
       {errors.submit && <div className="failure">{errors.submit}</div>}
 
       {/* Full Name Field */}
