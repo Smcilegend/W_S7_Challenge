@@ -57,24 +57,28 @@ export default function Form() {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const isValid = await validateForm();
+    e.preventDefault(); // Prevent the default form submission behavior
+  
+    const isValid = await validateForm(); // Validate the form
     if (isValid) {
-      setIsSubmitting(true);
+      setIsSubmitting(true); // Set submission status to true
+  
       setTimeout(() => {
         setSuccessMessage(
           `Order placed successfully! Full Name: ${formValues.fullName}, Size: ${formValues.size}, Toppings: ${
             formValues.toppings.length > 0
-              ? formValues.toppings.join(', ') // Join selected toppings
-              : 'None' // Show "None" when no toppings are selected
+              ? formValues.toppings.join(', ')
+              : 'None'
           }`
         );
-        setIsSubmitting(false);
-        setFormValues({ fullName: '', size: '', toppings: [] }); // Reset form
+        setFormValues({ fullName: '', size: '', toppings: [] }); // Reset the form values
+        setErrors({}); // Clear any remaining error messages
+        setIsSubmitting(false); // Reset submission status
       }, 1000);
     }
   };
 
+  
   return (
     <form onSubmit={handleSubmit}>
       <h2>Order Your Pizza</h2>
