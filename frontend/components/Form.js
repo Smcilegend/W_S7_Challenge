@@ -57,20 +57,11 @@ export default function Form() {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-  
-    const isValid = await validateForm(); // Validate the form
+    e.preventDefault();
+    const isValid = await validateForm();
     if (isValid) {
-      setIsSubmitting(true); // Set submission status to true
+      setIsSubmitting(true);
   
-      // Log the request payload for debugging
-      console.log('Submitting payload:', {
-        fullName: formValues.fullName,
-        size: formValues.size,
-        toppings: formValues.toppings,
-      });
-  
-      // Make the POST request
       try {
         const response = await fetch('http://localhost:9009/api/order', {
           method: 'POST',
@@ -82,31 +73,32 @@ export default function Form() {
           }),
         });
   
-        // Parse the response
         const result = await response.json();
         console.log('Response from server:', result);
   
         if (response.ok) {
-          setSuccessMessage(
-            `Thank you for your order, ${formValues.fullName}! Your ${formValues.size.toUpperCase()} pizza with ${
-              formValues.toppings.length > 0
-                ? formValues.toppings
-                    .map((id) => toppings.find((t) => t.topping_id === id).text)
-                    .join(', ')
-                : 'no toppings'
-            } is on the way.`
-          );
-          setFormValues({ fullName: '', size: '', toppings: [] }); // Reset the form values
-          setErrors({});
+          setTimeout(() => {
+            setSuccessMessage(
+              `Thank you for your order, ${formValues.fullName}! Your ${formValues.size.toUpperCase()} pizza with ${
+                formValues.toppings.length > 0
+                  ? formValues.toppings
+                      .map((id) => toppings.find((t) => t.topping_id === id).text)
+                      .join(', ')
+                  : 'no toppings'
+              } is on the way.`
+            );
+            setFormValues({ fullName: '', size: '', toppings: [] });
+            setErrors({});
+            setIsSubmitting(false);
+          }, 750); // Delay the success message
         } else {
           throw new Error(result.message || 'Failed to place order');
         }
       } catch (error) {
         console.error('Error placing order:', error);
-        setFormValues({ fullName: '', size: '', toppings: [] });
-        setErrors({});
-        setIsSubmitting(false);
-      }, 750);
+        setErrors({ submit: 'Failed to place order. Please try again.' });
+        setIsSubmitting(false); // Reset the submission state
+      }
     }
   };
 
