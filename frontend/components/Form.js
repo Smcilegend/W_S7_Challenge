@@ -3,9 +3,9 @@ import * as Yup from 'yup';
 
 // Validation error messages
 const validationErrors = {
-  fullNameTooShort: 'full name must be at least 3 characters',
-  fullNameTooLong: 'full name must be at most 20 characters',
-  sizeIncorrect: 'size must be S or M or L',
+  fullNameTooShort: 'Full name must be at least 3 characters',
+  fullNameTooLong: 'Full name must be at most 20 characters',
+  sizeIncorrect: 'Size must be S, M, or L',
 };
 
 // Validation schema using Yup
@@ -57,28 +57,29 @@ export default function Form() {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); // Prevent the default form submission behavior
-  
-    const isValid = await validateForm(); // Validate the form
+    e.preventDefault(); 
+
+    const isValid = await validateForm(); 
     if (isValid) {
-      setIsSubmitting(true); // Set submission status to true
-  
+      setIsSubmitting(true); 
+
       setTimeout(() => {
         setSuccessMessage(
-          `Order placed successfully! Full Name: ${formValues.fullName}, Size: ${formValues.size}, Toppings: ${
+          `Thank you for your order, ${formValues.fullName}! Your ${formValues.size.toUpperCase()} pizza with ${
             formValues.toppings.length > 0
-              ? formValues.toppings.join(', ')
-              : 'None'
-          }`
+              ? formValues.toppings
+                  .map((id) => toppings.find((t) => t.topping_id === id).text)
+                  .join(', ')
+              : 'no toppings'
+          } is on the way.`
         );
-        setFormValues({ fullName: '', size: '', toppings: [] }); // Reset the form values
-        setErrors({}); // Clear any remaining error messages
-        setIsSubmitting(false); // Reset submission status
+        setFormValues({ fullName: '', size: '', toppings: [] }); 
+        setErrors({}); 
+        setIsSubmitting(false); 
       }, 1000);
     }
   };
 
-  
   return (
     <form onSubmit={handleSubmit}>
       <h2>Order Your Pizza</h2>
@@ -128,8 +129,8 @@ export default function Form() {
                 setFormValues((prev) => ({
                   ...prev,
                   toppings: prev.toppings.includes(value)
-                    ? prev.toppings.filter((t) => t !== value) // Remove if already selected
-                    : [...prev.toppings, value], // Add if not selected
+                    ? prev.toppings.filter((t) => t !== value) 
+                    : [...prev.toppings, value], 
                 }));
               }}
             />
@@ -139,9 +140,16 @@ export default function Form() {
       </div>
 
       {/* Submit Button */}
-      <button type="submit" disabled={isSubmitting || Object.keys(errors).length > 0}>
-        {isSubmitting ? 'Submitting...' : 'Place Order'}
-      </button>
+      <input
+        type="submit"
+        value="Submit"
+        disabled={
+          isSubmitting || 
+          !formValues.fullName || 
+          !formValues.size ||
+          Object.keys(errors).length > 0 
+        }
+      />
     </form>
   );
 }
