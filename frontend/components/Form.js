@@ -57,26 +57,56 @@ export default function Form() {
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
-    e.preventDefault(); 
-
-    const isValid = await validateForm(); 
+    e.preventDefault(); // Prevent the default form submission behavior
+  
+    const isValid = await validateForm(); // Validate the form
     if (isValid) {
-      setIsSubmitting(true); 
-
-      setTimeout(() => {
-        setSuccessMessage(
-          `Thank you for your order, ${formValues.fullName}! Your ${formValues.size.toUpperCase()} pizza with ${
-            formValues.toppings.length > 0
-              ? formValues.toppings
-                  .map((id) => toppings.find((t) => t.topping_id === id).text)
-                  .join(', ')
-              : 'no toppings'
-          } is on the way.`
-        );
-        setFormValues({ fullName: '', size: '', toppings: [] }); 
-        setErrors({}); 
-        setIsSubmitting(false); 
-      }, 1000);
+      setIsSubmitting(true); // Set submission status to true
+  
+      // Log the request payload for debugging
+      console.log('Submitting payload:', {
+        fullName: formValues.fullName,
+        size: formValues.size,
+        toppings: formValues.toppings,
+      });
+  
+      // Make the POST request
+      try {
+        const response = await fetch('http://localhost:9009/api/order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fullName: formValues.fullName,
+            size: formValues.size,
+            toppings: formValues.toppings,
+          }),
+        });
+  
+        // Parse the response
+        const result = await response.json();
+        console.log('Response from server:', result);
+  
+        if (response.ok) {
+          setSuccessMessage(
+            `Thank you for your order, ${formValues.fullName}! Your ${formValues.size.toUpperCase()} pizza with ${
+              formValues.toppings.length > 0
+                ? formValues.toppings
+                    .map((id) => toppings.find((t) => t.topping_id === id).text)
+                    .join(', ')
+                : 'no toppings'
+            } is on the way.`
+          );
+          setFormValues({ fullName: '', size: '', toppings: [] }); // Reset the form values
+          setErrors({});
+        } else {
+          throw new Error(result.message || 'Failed to place order');
+        }
+      } catch (error) {
+        console.error('Error placing order:', error);
+        setErrors({ submit: 'Failed to place order. Please try again.' });
+      } finally {
+        setIsSubmitting(false);
+      }
     }
   };
 
