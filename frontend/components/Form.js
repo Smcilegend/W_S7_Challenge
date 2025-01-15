@@ -103,10 +103,10 @@ export default function Form() {
         }
       } catch (error) {
         console.error('Error placing order:', error);
-        setErrors({ submit: 'Failed to place order. Please try again.' });
-      } finally {
+        setFormValues({ fullName: '', size: '', toppings: [] });
+        setErrors({});
         setIsSubmitting(false);
-      }
+      }, 750);
     }
   };
 
